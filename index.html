@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEPAD FORMATIONS</title>
+
+<style>
+body{font-family:Arial;background:#0f172a;color:white;text-align:center;margin:0}
+input,button,select{padding:10px;margin:5px;width:90%;border-radius:8px;border:none}
+button{background:#22c55e;color:white;font-weight:bold}
+.card{background:#1f2937;padding:10px;margin:10px;border-radius:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+</style>
+</head>
+
+<body>
+
+<h2>📚 BEPAD FORMATIONS</h2>
+
+<!-- LOGIN -->
+<div id="login">
+<input id="name" placeholder="Nom et Prénom">
+<input id="phone" placeholder="Téléphone">
+<button onclick="enterSite()">Accéder au site</button>
+</div>
+
+<!-- MENU -->
+<div id="menu" style="display:none">
+<button onclick="showSection('MATHS')">📚 MATHS</button>
+<button onclick="showSection('PHYSIQUE')">⚛️ PHYSIQUE</button>
+<button onclick="showSection('TRADING')">💻 TRADING</button>
+<button onclick="showSection('ANNONCES')">📢 ANNONCES</button>
+<button onclick="showSection('INFORMATIONS')">ℹ️ INFORMATIONS</button>
+<button onclick="showSection('PUBLICITE')">📣 PUBLICITÉ</button>
+</div>
+
+<div id="content"></div>
+
+<!-- PAIEMENT -->
+<div id="paymentBox" style="display:none" class="card">
+<h3>Paiement Mobile Money</h3>
+<p>📞 690306930 / 694299455</p>
+
+<div id="dynamicFields"></div>
+
+<input id="docTitle" placeholder="Titre du document">
+<input id="payerPhone" placeholder="Téléphone">
+<input id="transactionId" placeholder="ID transaction">
+
+<button onclick="submitPayment()">Envoyer</button>
+<button onclick="closePayment()">Annuler</button>
+</div>
+
+<script>
+
+/* LOGIN */
+function enterSite(){
+ let name=document.getElementById("name").value;
+ let phone=document.getElementById("phone").value;
+
+ if(!name || !phone){
+   alert("Nom et téléphone requis");
+   return;
+ }
+
+ alert("Bienvenue "+name);
+ document.getElementById("login").style.display="none";
+ document.getElementById("menu").style.display="block";
+}
+
+/* RETOUR */
+function backMenu(){
+ document.getElementById("content").innerHTML="";
+}
+
+/* DOCUMENTS PAR RUBRIQUE */
+const docs = {
+ MATHS: ["Algèbre BEPC","Analyse Bac","Probabilités","Exercices corrigés"],
+ PHYSIQUE: ["Mécanique","Électricité","Optique","Physique Bac"],
+ TRADING: ["Introduction Trading","Stratégies RSI","Analyse graphique"],
+ ANNONCES: ["Résultats concours","Communiqué officiel"],
+ INFORMATIONS: ["Guide étudiant","Calendrier académique"],
+ PUBLICITE: ["Offres spéciales","Partenariats"]
+};
+
+/* AFFICHAGE */
+function showSection(section){
+
+ let list = "";
+
+ docs[section].forEach(doc=>{
+   list += `<div class="card">${doc}</div>`;
+ });
+
+ document.getElementById("content").innerHTML = `
+ <button onclick="backMenu()">⬅ Retour</button>
+
+ <div class="card">
+ <h3>${section}</h3>
+
+ <div class="grid">${list}</div>
+
+ <button onclick="chooseAction('lecture','${section}')">📖 Lire</button>
+ <button onclick="chooseAction('impression','${section}')">🖨 Imprimer</button>
+ ${section !== "TRADING" ? `<button onclick="chooseAction('telechargement','${section}')">⬇ Télécharger</button>` : ""}
+
+ </div>
+ `;
+}
+
+/* CHOIX ACTION */
+function chooseAction(type,section){
+
+ let title = prompt("Entrez le titre du document");
+
+ if(!title){
+   alert("Titre requis");
+   return;
+ }
+
+ document.getElementById("docTitle").value = title;
+
+ sendOrder(type, section + " - " + title);
+
+ document.getElementById("paymentBox").style.display="block";
+}
+
+/* PAIEMENT */
+function submitPayment(){
+ let phone=document.getElementById("payerPhone").value;
+ let trans=document.getElementById("transactionId").value;
+
+ if(!phone || !trans){
+   alert("Remplir tous les champs");
+   return;
+ }
+
+ alert("Paiement envoyé ✔");
+ closePayment();
+}
+
+/* FERMER */
+function closePayment(){
+ document.getElementById("paymentBox").style.display="none";
+}
+
+</script>
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCuV8lTp-j-iqlfIfxxKVL5FkX-j-7Zh_U",
+  authDomain: "f-7444.firebaseapp.com",
+  projectId: "f-7444"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ENVOI */
+function sendOrder(type, section){
+ let phone=document.getElementById("phone").value;
+
+ db.collection("orders").add({
+   phone:phone,
+   course:section,
+   action:type,
+   status:"pending",
+   date:Date.now()
+ });
+}
+</script>
+
+</body>
+</html>
