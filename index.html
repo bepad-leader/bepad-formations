@@ -27,13 +27,15 @@ button{background:#22c55e;color:white;font-weight:bold}
 
 <!-- MENU -->
 <div id="menu" style="display:none">
+
 <button onclick="showSection('MATHS')">📚 MATHS</button>
-<button onclick="showSection('PHYSIQUE')">⚛️ PHYSIQUE</button>
-<button onclick="showSection('TRADING')">💻 TRADING</button>
-<button onclick="showSection('ANNONCES')">📢 ANNONCES</button>
-<button onclick="showSection('INFORMATIONS')">ℹ️ INFORMATIONS</button>
-<button onclick="showSection('PUBLICITE')">📣 PUBLICITÉ</button>
- <button onclick="window.location.href='contacts.html'">📞 CONTACTS</button>
+<button onclick="showSection('PHYS_CH')">⚛️ PHYS-CH</button>
+<button onclick="showSection('SVT')">🧬 SVT</button>
+<button onclick="showSection('PUBLICATIONS')">📖 PUBLICATIONS</button>
+<button onclick="showSection('GESTION_PRIVEE')">🏫 GESTION SCOLAIRE AU PRIVÉ LAÏC</button>
+
+<button onclick="window.location.href='contacts.html'">📞 CONTACTS</button>
+
 </div>
 
 <div id="content"></div>
@@ -77,12 +79,11 @@ function backMenu(){
 
 /* DOCUMENTS PAR RUBRIQUE */
 const docs = {
- MATHS: ["Algèbre BEPC","Analyse Bac","Probabilités","Exercices corrigés"],
- PHYSIQUE: ["Mécanique","Électricité","Optique","Physique Bac"],
- TRADING: ["Introduction Trading","Stratégies RSI","Analyse graphique"],
- ANNONCES: ["Résultats concours","Communiqué officiel"],
- INFORMATIONS: ["Guide étudiant","Calendrier académique"],
- PUBLICITE: ["Offres spéciales","Partenariats"]
+ MATHS: ["BEPC","PROBATOIRE","BACCALAURÉAT","CONCOURS"],
+ PHYS_CH: ["BEPC","PROBATOIRE","BACCALAURÉAT","CONCOURS"],
+ SVT: ["BEPC","PROBATOIRE","BACCALAURÉAT","CONCOURS"],
+ PUBLICATIONS: ["Articles","Communiqués","Documents officiels"],
+ GESTION_PRIVEE: ["ADMINISTRATION","DISCIPLINE","PÉDAGOGIE"]
 };
 
 /* AFFICHAGE */
