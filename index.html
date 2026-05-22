@@ -80,11 +80,11 @@ Annuler
 < script >
 
 /* SE CONNECTER */
-fonction  enterSite ( ) {
+function  enterSite ( ) {
  let  name = document . getElementById ( "name" ) . value ;
  let  phone = document . getElementById ( "phone" ) . value ;
 
- si ( ! nom || ! téléphone ) {
+ if( ! nom || ! téléphone ) {
    alert ( "Nom et téléphone requis" ) ;
    retour ;
  }
@@ -95,7 +95,7 @@ fonction  enterSite ( ) {
 }
 
 /* RETOUR */
-fonction  backMenu ( ) {
+function  backMenu ( ) {
  document.getElementById ( "content " ) . innerHTML = " " ;
 }
 
