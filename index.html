@@ -50,19 +50,32 @@ button{background:#22c55e;color:white;font-weight:bold}
 <div  id = "content" > </ div >
 
 <!-- PAIEMENT -->
-< div  id = "paymentBox"  style = " display : none "  class = "card" >
-< h3 > Paiement Mobile Money </ h3 >
-<p> 📞 690306930 / 694299455 </p>​
+<!-- PAIEMENT -->
+<div id="paymentBox" style="display:none" class="card">
 
-< div  id = " dynamicFields " > </div>
+<h3>Paiement Mobile Money</h3>
 
-< input  id = "docTitle"  placeholder = "Titre du document" >
-< input  id = "payerPhone"  placeholder = "Téléphone" >
-< input  id = "transactionId"  placeholder = "ID de transaction" >
+<p>
+📞 690306930 / 694299455
+</p>
 
-< bouton  onclick = " submitPayment ( ) " > Envoyer </ bouton >
-< button  onclick = " closePayment ( ) " > Annuler </button>​​
-</ div >
+<div id="dynamicFields"></div>
+
+<input id="docTitle" placeholder="Titre du document">
+
+<input id="payerPhone" placeholder="Téléphone">
+
+<input id="transactionId" placeholder="ID transaction">
+
+<button onclick="submitPayment()">
+Envoyer
+</button>
+
+<button onclick="closePayment()">
+Annuler
+</button>
+
+</div>
 
 < script >
 
