@@ -102,47 +102,60 @@ function backMenu(){
 }
 
 /* DOCUMENTS PAR RUBRIQUE */
-const docs = {
+const API_URL = "VOTRE_URL";
 
- MATHS: [
-  "BEPC",
-  "PROBATOIRE",
-  "BACCALAURÉAT",
-  "CONCOURS"
- ],
+async function showSection(section){
 
- PHYS_CH: [
-  "BEPC",
-  "PROBATOIRE",
-  "BACCALAURÉAT",
-  "CONCOURS"
- ],
+ document.getElementById("content").innerHTML =
+ "<p>Chargement...</p>";
 
- SVT: [
-  "BEPC",
-  "PROBATOIRE",
-  "BACCALAURÉAT",
-  "CONCOURS"
- ],
+ try{
 
- PUBLICATIONS: [
-  "Publications disponibles"
- ],
+   const response = await fetch(
+     API_URL + "?section=" + section
+   );
 
- GESTION_PRIVEE: [
-  "ADMINISTRATION",
-  "DISCIPLINE",
-  "PÉDAGOGIE"
- ],
+   const data = await response.json();
 
- VIDEOS: [
-  "Présentation des contenus pédagogiques",
-  "Cours en direct",
-  "Cours en différé",
-  "Démonstrations pédagogiques"
- ]
+   let list = "";
 
-};
+   data.forEach(doc=>{
+
+     list += `
+     <div class="card">
+
+       <h3>${doc.title}</h3>
+
+       ${doc.type === "video"
+         ? `
+         <video width="100%" controls>
+           <source src="${doc.link}">
+         </video>
+         `
+         : `
+         <button onclick="window.open('${doc.link}')">
+           📖 Ouvrir
+         </button>
+         `
+       }
+
+     </div>
+     `;
+   });
+
+   document.getElementById("content").innerHTML = `
+   <button onclick="backMenu()">⬅ Retour</button>
+   <div class="grid">${list}</div>
+   `;
+
+ }catch(error){
+
+   document.getElementById("content").innerHTML =
+   "<p>Erreur de chargement</p>";
+
+   console.log(error);
+ }
+}
 
 /* AFFICHAGE */
 function showSection(section){
