@@ -80,7 +80,6 @@ button{
   <h3>Paiement Mobile Money</h3>
   <p>📞 690306930 / 694299455</p>
 
-  <input id="docTitle" placeholder="Titre du document">
   <input id="payerPhone" placeholder="Téléphone">
   <input id="transactionId" placeholder="ID transaction">
 
@@ -90,21 +89,9 @@ button{
 </div>
 
 <script>
-  let currentFile = null;
-  function chooseAction(title, link, type){
+const API_URL = "https://script.google.com/macros/s/AKfycbzYljUXQ5oJH5_mexL_dFYG6f1cWok8y_E5gX3eeg4_enjNtZf0Vc2fGGJm21koOoPZ/exec";
 
-  currentFile = {
-    title: title,
-    link: link,
-    type: type
-  };
-
-  document.getElementById("docTitle").value = title;
-  document.getElementById("paymentBox").style.display = "block";
-}
-const API_URL =
-"https://script.google.com/macros/s/AKfycbzYljUXQ5oJH5_mexL_dFYG6f1cWok8y_E5gX3eeg4_enjNtZf0Vc2fGGJm21koOoPZ/exec";
-
+let currentFile = null;
 
 /* LOGIN */
 function enterSite(){
@@ -127,13 +114,18 @@ function backMenu(){
   document.getElementById("content").innerHTML = "";
 }
 
-/* =========================
-   AFFICHAGE CORRIGÉ API
-   ========================= */
+/* CHOIX ACTION */
+function chooseAction(title, link, type){
+
+  currentFile = { title, link, type };
+
+  document.getElementById("paymentBox").style.display = "block";
+}
+
+/* SECTION */
 async function showSection(section){
 
-  document.getElementById("content").innerHTML =
-  "<p>Chargement...</p>";
+  document.getElementById("content").innerHTML = "<p>Chargement...</p>";
 
   try{
 
@@ -141,8 +133,7 @@ async function showSection(section){
     const result = await response.json();
 
     if(!result.success){
-      document.getElementById("content").innerHTML =
-      "<p>Erreur de section</p>";
+      document.getElementById("content").innerHTML = "<p>Erreur de section</p>";
       return;
     }
 
@@ -156,18 +147,18 @@ async function showSection(section){
 
         cat.files.forEach(file => {
           filesHTML += `
-  <div class="card">
-    <h3>${file.title}</h3>
+            <div class="card">
+              <h3>${file.title}</h3>
 
-    <button onclick="chooseAction('${file.title}','${file.link}','lecture')">
-      📖 Lire (500 FCFA/heure)
-    </button>
+              <button onclick="chooseAction('${file.title}','${file.link}','lecture')">
+                📖 Lire (500 FCFA/heure)
+              </button>
 
-    <button onclick="chooseAction('${file.title}','${file.link}','impression')">
-      🖨 Imprimer (200 FCFA/page)
-    </button>
-  </div>
-`;
+              <button onclick="chooseAction('${file.title}','${file.link}','impression')">
+                🖨 Imprimer (200 FCFA/page)
+              </button>
+            </div>
+          `;
         });
 
       } else {
@@ -177,22 +168,17 @@ async function showSection(section){
       html += `
         <div class="card">
           <h2>${cat.category}</h2>
-          <div class="grid">
-            ${filesHTML}
-          </div>
+          <div class="grid">${filesHTML}</div>
         </div>
       `;
     });
 
-    document.getElementById("content").innerHTML = `
-      <button onclick="backMenu()">⬅ Retour</button>
-      ${html}
-    `;
+    document.getElementById("content").innerHTML =
+      `<button onclick="backMenu()">⬅ Retour</button>` + html;
 
   }catch(error){
     console.log(error);
-    document.getElementById("content").innerHTML =
-    "<p>Erreur de chargement</p>";
+    document.getElementById("content").innerHTML = "<p>Erreur de chargement</p>";
   }
 }
 
@@ -207,29 +193,16 @@ function submitPayment(){
     return;
   }
 
-  db.collection("orders").add({
-    phone: phone,
-    title: currentFile.title,
-    link: currentFile.link,
-    action: currentFile.type,
-    transactionId: trans,
-    status: "pending",
-    date: Date.now()
-  });
-
+  // ici on évite db (Firebase supprimé car non configuré)
   alert("Demande envoyée ✔ - en attente de validation");
 
   closePayment();
 }
 
-  alert("Paiement envoyé ✔");
-  closePayment();
-}
-
+/* FERMER PAIEMENT */
 function closePayment(){
   document.getElementById("paymentBox").style.display = "none";
 }
-
 </script>
 
 </body>
