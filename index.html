@@ -1,1 +1,240 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEPAD FORMATIONS</title>
 
+<style>
+body{
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+  margin:0;
+}
+
+input,button{
+  padding:10px;
+  margin:5px;
+  width:90%;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  background:#22c55e;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.card{
+  background:#1f2937;
+  padding:10px;
+  margin:10px;
+  border-radius:10px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>📚 BEPAD FORMATIONS</h2>
+
+<!-- LOGIN -->
+<div id="login">
+  <input id="name" placeholder="Nom et Prénom">
+  <input id="phone" placeholder="Téléphone">
+  <button onclick="enterSite()">Accéder au site</button>
+</div>
+
+<!-- MENU -->
+<div id="menu" style="display:none">
+
+  <button onclick="showSection('MATHS')">📚 MATHS</button>
+  <button onclick="showSection('PHYS-CH')">⚛️ PHYS-CH</button>
+  <button onclick="showSection('SVT')">🧬 SVT</button>
+  <button onclick="showSection('PUBLICATIONS')">📖 PUBLICATIONS</button>
+  <button onclick="showSection('GESTION_PRIVEE')">🏫 GESTION PRIVÉE</button>
+  <button onclick="showSection('VIDEO')">🎥 VIDEO</button>
+
+  <button onclick="window.location.href='contacts.html'">
+    📞 CONTACTS
+  </button>
+
+</div>
+
+<div id="content"></div>
+
+<!-- PAIEMENT -->
+<div id="paymentBox" style="display:none" class="card">
+
+  <h3>💳 Paiement Mobile Money</h3>
+  <p>690306930 / 694299455</p>
+
+  <input id="payerPhone" placeholder="Téléphone de paiement">
+  <input id="transactionId" placeholder="ID transaction">
+
+  <button onclick="submitPayment()">Envoyer</button>
+  <button onclick="closePayment()">Annuler</button>
+
+</div>
+
+<script>
+
+const API_URL = "https://script.google.com/macros/s/AKfycbzYljUXQ5oJH5_mexL_dFYG6f1cWok8y_E5gX3eeg4_enjNtZf0Vc2fGGJm21koOoPZ/exec";
+
+let currentFile = null;
+
+/* LOGIN */
+function enterSite(){
+  const name = document.getElementById("name").value;
+  const phone = document.getElementById("phone").value;
+
+  if(!name || !phone){
+    alert("Nom et téléphone requis");
+    return;
+  }
+
+  alert("Bienvenue " + name);
+
+  document.getElementById("login").style.display = "none";
+  document.getElementById("menu").style.display = "block";
+}
+
+/* BACK */
+function backMenu(){
+  document.getElementById("content").innerHTML = "";
+}
+
+/* OPEN PAYMENT */
+function chooseAction(title, link, type){
+
+  currentFile = { title, link, type };
+
+  document.getElementById("paymentBox").style.display = "block";
+}
+
+/* LOAD SECTIONS */
+async function showSection(section){
+
+  document.getElementById("content").innerHTML = "<p>Chargement...</p>";
+
+  try{
+
+    const response = await fetch(API_URL + "?section=" + section);
+    const result = await response.json();
+
+    if(!result.success){
+      document.getElementById("content").innerHTML = "<p>Erreur de section</p>";
+      return;
+    }
+
+    let html = "";
+
+    result.categories.forEach(cat => {
+
+      let filesHTML = "";
+
+      if(cat.files && cat.files.length > 0){
+
+        cat.files.forEach(file => {
+          filesHTML += `
+            <div class="card">
+              <h3>${file.title}</h3>
+
+              <button onclick="chooseAction('${file.title}','${file.link}','lecture')">
+                📖 Lire (500 FCFA/heure)
+              </button>
+
+              <button onclick="chooseAction('${file.title}','${file.link}','impression')">
+                🖨 Imprimer (200 FCFA/page)
+              </button>
+            </div>
+          `;
+        });
+
+      } else {
+        filesHTML = "<p>Aucun fichier</p>";
+      }
+
+      html += `
+        <div class="card">
+          <h2>${cat.category}</h2>
+          <div class="grid">${filesHTML}</div>
+        </div>
+      `;
+    });
+
+    document.getElementById("content").innerHTML =
+      `<button onclick="backMenu()">⬅ Retour</button>` + html;
+
+  }catch(err){
+    console.log(err);
+    document.getElementById("content").innerHTML = "<p>Erreur de chargement</p>";
+  }
+}
+
+/* PAYMENT */
+async function submitPayment(){
+
+  const phone = document.getElementById("payerPhone").value;
+  const trans = document.getElementById("transactionId").value;
+
+  if(!phone || !trans){
+    alert("Remplir tous les champs");
+    return;
+  }
+
+  const data = {
+    name: document.getElementById("name").value,
+    phone: phone,
+    transactionId: trans,
+    title: currentFile ? currentFile.title : "",
+    action: currentFile ? currentFile.type : ""
+  };
+
+  try{
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(data)
+    });
+
+    const result = await res.json();
+
+    if(result.success){
+
+      alert("Demande envoyée ✔ - en attente de validation");
+
+      document.getElementById("payerPhone").value = "";
+      document.getElementById("transactionId").value = "";
+
+      closePayment();
+
+    } else {
+      alert("Erreur envoi");
+    }
+
+  }catch(err){
+    console.log(err);
+    alert("Erreur de connexion");
+  }
+}
+
+/* CLOSE PAYMENT */
+function closePayment(){
+  document.getElementById("paymentBox").style.display = "none";
+}
+
+</script>
+
+</body>
+</html>
