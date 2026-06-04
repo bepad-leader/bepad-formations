@@ -90,6 +90,18 @@ button{
 </div>
 
 <script>
+  let currentFile = null;
+  function chooseAction(title, link, type){
+
+  currentFile = {
+    title: title,
+    link: link,
+    type: type
+  };
+
+  document.getElementById("docTitle").value = title;
+  document.getElementById("paymentBox").style.display = "block";
+}
 const API_URL =
 "https://script.google.com/macros/s/AKfycbzYljUXQ5oJH5_mexL_dFYG6f1cWok8y_E5gX3eeg4_enjNtZf0Vc2fGGJm21koOoPZ/exec";
 
@@ -144,14 +156,18 @@ async function showSection(section){
 
         cat.files.forEach(file => {
           filesHTML += `
-            <div class="card">
-              <h3>${file.title}</h3>
+  <div class="card">
+    <h3>${file.title}</h3>
 
-              <button onclick="window.open('${file.link}')">
-                📖 Ouvrir
-              </button>
-            </div>
-          `;
+    <button onclick="chooseAction('${file.title}','${file.link}','lecture')">
+      📖 Lire (500 FCFA/heure)
+    </button>
+
+    <button onclick="chooseAction('${file.title}','${file.link}','impression')">
+      🖨 Imprimer (200 FCFA/page)
+    </button>
+  </div>
+`;
         });
 
       } else {
@@ -190,6 +206,21 @@ function submitPayment(){
     alert("Remplir tous les champs");
     return;
   }
+
+  db.collection("orders").add({
+    phone: phone,
+    title: currentFile.title,
+    link: currentFile.link,
+    action: currentFile.type,
+    transactionId: trans,
+    status: "pending",
+    date: Date.now()
+  });
+
+  alert("Demande envoyée ✔ - en attente de validation");
+
+  closePayment();
+}
 
   alert("Paiement envoyé ✔");
   closePayment();
