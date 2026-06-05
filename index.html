@@ -201,14 +201,21 @@ async function submitPayment(){
     action: currentFile ? currentFile.type : ""
   };
 
-  try{
+  try {
 
     const res = await fetch(API_URL, {
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      }
     });
 
-    const result = await res.json();
+    const text = await res.text(); // 🔴 IMPORTANT (pas JSON direct)
+
+    console.log("Réponse serveur:", text);
+
+    const result = JSON.parse(text);
 
     if(result.success){
 
@@ -220,10 +227,10 @@ async function submitPayment(){
       closePayment();
 
     } else {
-      alert("Erreur envoi");
+      alert("Erreur serveur : " + (result.error || "inconnue"));
     }
 
-  }catch(err){
+  } catch(err){
     console.log(err);
     alert("Erreur de connexion");
   }
