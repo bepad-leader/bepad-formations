@@ -67,6 +67,7 @@ button{
   <button onclick="showSection('VIDEO')">🎥 VIDEO</button>
 
   <button onclick="window.location.href='contacts.html'">
+    <button onclick="loadMyPurchases()">📦 MES ACHATS</button>
     📞 CONTACTS
   </button>
 
@@ -241,7 +242,66 @@ async function submitPayment(){
 function closePayment(){
   document.getElementById("paymentBox").style.display = "none";
 }
+async function loadMyPurchases(){
 
+  const phone = document.getElementById("phone").value;
+
+  if(!phone){
+    alert("Veuillez entrer votre téléphone");
+    return;
+  }
+
+  document.getElementById("content").innerHTML = "<p>Chargement...</p>";
+
+  try{
+
+    const res = await fetch(API_URL + "?action=mesAchats&phone=" + phone);
+    const result = await res.json();
+
+    if(!result.success){
+      document.getElementById("content").innerHTML = "<p>Aucun achat trouvé</p>";
+      return;
+    }
+
+    let html = "";
+
+    result.data.forEach(item => {
+
+      let btnLire = "";
+      let btnImprimer = "";
+
+      if(item.status === "VALIDÉ"){
+
+        btnLire = `<button onclick="alert('Ouverture: ${item.title}')">📖 Lire</button>`;
+
+        btnImprimer = `<button onclick="window.print()">🖨 Imprimer</button>`;
+
+      } else {
+
+        btnLire = `<button disabled>📖 Lire (EN ATTENTE)</button>`;
+        btnImprimer = `<button disabled>🖨 Imprimer (EN ATTENTE)</button>`;
+      }
+
+      html += `
+        <div class="card">
+          <h3>${item.title}</h3>
+          <p>Type : ${item.action}</p>
+          <p>Pages : ${item.pages || 0}</p>
+          <p>Montant : ${item.amount} FCFA</p>
+          <p>Statut : ${item.status}</p>
+          ${btnLire}
+          ${btnImprimer}
+        </div>
+      `;
+    });
+
+    document.getElementById("content").innerHTML = html;
+
+  }catch(err){
+    console.log(err);
+    alert("Erreur chargement achats");
+  }
+}
 </script>
 
 </body>
