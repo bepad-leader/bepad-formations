@@ -233,7 +233,7 @@ async function submitPayment(){
 
   } catch(err){
     console.log(err);
-    alert("Erreur de connexion");
+    alert("Erreur de connexion : " + err.message);
   }
 }
 
