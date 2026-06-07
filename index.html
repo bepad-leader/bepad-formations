@@ -267,33 +267,14 @@ async function loadMyPurchases(){
 
     result.data.forEach(item => {
 
-      let btnLire = "";
-      let btnImprimer = "";
-
-      if(item.status === "VALIDÉ"){
-
-        btnLire = `<button onclick="alert('Ouverture: ${item.title}')">📖 Lire</button>`;
-
-        btnImprimer = `<button onclick="window.print()">🖨 Imprimer</button>`;
-
-      } else {
-
-        btnLire = `<button disabled>📖 Lire (EN ATTENTE)</button>`;
-        btnImprimer = `<button disabled>🖨 Imprimer (EN ATTENTE)</button>`;
-      }
-
-      html += `
-        <div class="card">
-          <h3>${item.title}</h3>
-          <p>Type : ${item.action}</p>
-          <p>Pages : ${item.pages || 0}</p>
-          <p>Montant : ${item.amount} FCFA</p>
-          <p>Statut : ${item.status}</p>
-          ${btnLire}
-          ${btnImprimer}
-        </div>
-      `;
-    });
+  html += `
+    <div class="card">
+      <h3>${item.title}</h3>
+      <p>Action : ${item.action}</p>
+      <p>Statut : ${item.status}</p>
+    </div>
+  `;
+});
 
     document.getElementById("content").innerHTML = html;
 
