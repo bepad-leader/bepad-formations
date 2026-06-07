@@ -153,19 +153,7 @@ async function showSection(section){
       document.getElementById("content").innerHTML = "<p>Erreur de section</p>";
       return;
     }
-    const pages = currentFile.pagesInput ? calculatePages(currentFile.pagesInput) : 0;
-const amount = pages * 200;
-
-const data = {
-  name: document.getElementById("name").value,
-  phone: phone,
-  transactionId: trans,
-  title: currentFile ? currentFile.title : "",
-  action: currentFile ? currentFile.type : "",
-  pagesInput: currentFile.pagesInput || "",
-  pages: pages,
-  amount: amount
-};
+    
 
     let html = "";
 
