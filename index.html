@@ -153,33 +153,19 @@ async function showSection(section){
       document.getElementById("content").innerHTML = "<p>Erreur de section</p>";
       return;
     }
-    function chooseAction(...) {
-  ...
-}
+    const pages = currentFile.pagesInput ? calculatePages(currentFile.pagesInput) : 0;
+const amount = pages * 200;
 
-function chooseSection(...) {
-  ...
-}
-
-function calculatePages(input){   ← ICI EXACTEMENT
-
-  if(input.includes("-")){
-
-    const parts = input.split("-");
-    const start = parseInt(parts[0].trim());
-    const end = parseInt(parts[1].trim());
-
-    return end - start + 1;
-
-  } else {
-
-    return input.split(",").length;
-  }
-}
-
-function submitPayment() {
-  ...
-}
+const data = {
+  name: document.getElementById("name").value,
+  phone: phone,
+  transactionId: trans,
+  title: currentFile ? currentFile.title : "",
+  action: currentFile ? currentFile.type : "",
+  pagesInput: currentFile.pagesInput || "",
+  pages: pages,
+  amount: amount
+};
 
     let html = "";
 
