@@ -121,6 +121,21 @@ function chooseAction(title, link, type){
 
   currentFile = { title, link, type };
 
+  if(type === "impression"){
+
+    const input = prompt(
+      "Entrer les pages à imprimer\n" +
+      "Exemple : 5,7,25 ou 15-21"
+    );
+
+    if(!input){
+      alert("Aucune page saisie");
+      return;
+    }
+
+    currentFile.pagesInput = input;
+  }
+
   document.getElementById("paymentBox").style.display = "block";
 }
 
@@ -138,6 +153,33 @@ async function showSection(section){
       document.getElementById("content").innerHTML = "<p>Erreur de section</p>";
       return;
     }
+    function chooseAction(...) {
+  ...
+}
+
+function chooseSection(...) {
+  ...
+}
+
+function calculatePages(input){   ← ICI EXACTEMENT
+
+  if(input.includes("-")){
+
+    const parts = input.split("-");
+    const start = parseInt(parts[0].trim());
+    const end = parseInt(parts[1].trim());
+
+    return end - start + 1;
+
+  } else {
+
+    return input.split(",").length;
+  }
+}
+
+function submitPayment() {
+  ...
+}
 
     let html = "";
 
@@ -195,13 +237,19 @@ async function submitPayment(){
     return;
   }
 
-  const data = {
-    name: document.getElementById("name").value,
-    phone: phone,
-    transactionId: trans,
-    title: currentFile ? currentFile.title : "",
-    action: currentFile ? currentFile.type : ""
-  };
+  const pages = currentFile.pagesInput ? calculatePages(currentFile.pagesInput) : 0;
+const amount = pages * 200;
+
+const data = {
+  name: document.getElementById("name").value,
+  phone: phone,
+  transactionId: trans,
+  title: currentFile ? currentFile.title : "",
+  action: currentFile ? currentFile.type : "",
+  pagesInput: currentFile.pagesInput || "",
+  pages: pages,
+  amount: amount
+};
 
   try {
 
@@ -268,12 +316,12 @@ async function loadMyPurchases(){
     result.data.forEach(item => {
 
   html += `
-    <div class="card">
-      <h3>${item.title}</h3>
-      <p>Action : ${item.action}</p>
-      <p>Statut : ${item.status}</p>
-    </div>
-  `;
+  <div class="card">
+    <h3>${item.title}</h3>
+    <p>Action : ${item.action}</p>
+    <p>Statut : ${item.status}</p>
+  </div>
+`;
 });
 
     document.getElementById("content").innerHTML = html;
