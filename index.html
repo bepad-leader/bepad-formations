@@ -122,19 +122,9 @@ function chooseAction(title, link, type){
   currentFile = { title, link, type };
 
   if(type === "impression"){
-
-    const input = prompt(
-      "Entrer les pages à imprimer\n" +
-      "Exemple : 5,7,25 ou 15-21"
-    );
-
-    if(!input){
-      alert("Aucune page saisie");
-      return;
-    }
-
-    currentFile.pagesInput = input;
-  }
+  window.open(link, "_blank");
+  return;
+}
 
   document.getElementById("paymentBox").style.display = "block";
 }
