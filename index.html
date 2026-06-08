@@ -342,28 +342,21 @@ async function loadMyPurchases(){
 
   if(item.status === "VALIDÉ"){
 
-    if(item.action === "lecture"){
-      actionButton = `
-        <button onclick="window.open('${item.link}', '_blank')">
-          📖 Ouvrir le document
-        </button>
-      `;
-    }
-
-    if(item.action === "impression"){
-      actionButton = `
-        <button onclick="window.open('${item.link}', '_blank')">
-          🖨 Ouvrir pour imprimer
-        </button>
-      `;
-    }
+    actionButton = `
+      <button onclick="window.open('${item.link}', '_blank')" style="background:#22c55e;color:white;padding:10px;border:none;border-radius:8px;">
+        🖨 CLIQUER ICI POUR IMPRIMER
+      </button>
+    `;
   }
 
   html += `
     <div class="card">
       <h3>${item.title}</h3>
-      <p>Action : ${item.action}</p>
-      <p>Statut : ${item.status}</p>
+
+      <p><strong>Action :</strong> ${item.action}</p>
+
+      <p><strong>Statut :</strong> ${item.status}</p>
+
       ${actionButton}
     </div>
   `;
