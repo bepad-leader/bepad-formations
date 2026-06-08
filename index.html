@@ -338,28 +338,21 @@ async function loadMyPurchases(){
 
     result.data.forEach(item => {
 
-  let actionButton = "";
-
   if(item.status === "VALIDÉ"){
 
-    actionButton = `
-      <button onclick="window.open('${item.link}', '_blank')" style="background:#22c55e;color:white;padding:10px;border:none;border-radius:8px;">
-        🖨 CLIQUER ICI POUR IMPRIMER
-      </button>
+    html += `
+      <div class="card">
+        <h3>${item.title}</h3>
+        <p>Action : ${item.action}</p>
+        <p>Statut : PRÊT POUR IMPRESSION</p>
+
+        <button onclick="window.open('${item.link}', '_blank')">
+          🖨 CLIQUER ICI POUR IMPRIMER
+        </button>
+      </div>
     `;
   }
 
-  html += `
-    <div class="card">
-      <h3>${item.title}</h3>
-
-      <p><strong>Action :</strong> ${item.action}</p>
-
-      <p><strong>Statut :</strong> ${item.status}</p>
-
-      ${actionButton}
-    </div>
-  `;
 });
 
     document.getElementById("content").innerHTML = html;
