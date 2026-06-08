@@ -199,6 +199,27 @@ async function showSection(section){
     document.getElementById("content").innerHTML = "<p>Erreur de chargement</p>";
   }
 }
+  function calculatePages(input){
+
+  input = input.trim();
+
+  if(input.includes("-")){
+
+    const parts = input.split("-");
+    const start = parseInt(parts[0].trim());
+    const end = parseInt(parts[1].trim());
+
+    if(isNaN(start) || isNaN(end) || end < start){
+      return 0;
+    }
+
+    return end - start + 1;
+  }
+
+  const pages = input.split(",");
+
+  return pages.filter(p => p.trim() !== "").length;
+}
 
 /* PAYMENT */
 async function submitPayment(){
