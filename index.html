@@ -337,13 +337,35 @@ async function loadMyPurchases(){
 
     result.data.forEach(item => {
 
+  let actionButton = "";
+
+  if(item.status === "VALIDÉ"){
+
+    if(item.action === "lecture"){
+      actionButton = `
+        <button onclick="window.open('${item.link}', '_blank')">
+          📖 Ouvrir le document
+        </button>
+      `;
+    }
+
+    if(item.action === "impression"){
+      actionButton = `
+        <button onclick="window.open('${item.link}', '_blank')">
+          🖨 Ouvrir pour imprimer
+        </button>
+      `;
+    }
+  }
+
   html += `
-  <div class="card">
-    <h3>${item.title}</h3>
-    <p>Action : ${item.action}</p>
-    <p>Statut : ${item.status}</p>
-  </div>
-`;
+    <div class="card">
+      <h3>${item.title}</h3>
+      <p>Action : ${item.action}</p>
+      <p>Statut : ${item.status}</p>
+      ${actionButton}
+    </div>
+  `;
 });
 
     document.getElementById("content").innerHTML = html;
