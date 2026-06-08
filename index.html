@@ -210,6 +210,27 @@ async function showSection(section){
 
   return pages.filter(p => p.trim() !== "").length;
 }
+  function continueImpression(){
+
+  const input = prompt(
+    "Entrez les pages à imprimer\nExemple : 5,7,25 ou 15-21"
+  );
+
+  if(!input){
+    alert("Aucune page saisie");
+    return;
+  }
+
+  currentFile.pagesInput = input;
+
+  const pages = calculatePages(input);
+  const amount = pages * 200;
+
+  currentFile.pages = pages;
+  currentFile.amount = amount;
+
+  document.getElementById("paymentBox").style.display = "block";
+}
 
 /* PAYMENT */
 async function submitPayment(){
