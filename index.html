@@ -122,7 +122,23 @@ function chooseAction(title, link, type){
   currentFile = { title, link, type };
 
   if(type === "impression"){
+
+  currentFile = { title, link, type };
+
   window.open(link, "_blank");
+
+  document.getElementById("content").innerHTML = `
+    <div class="card">
+      <h3>📄 Document ouvert</h3>
+      <p>✔ Consultez le document dans l’onglet ouvert.</p>
+      <p>✔ Revenez ici pour continuer l’impression.</p>
+
+      <button onclick="continueImpression()">
+        Continuer impression
+      </button>
+    </div>
+  `;
+
   return;
 }
 
