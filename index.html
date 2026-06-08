@@ -326,34 +326,27 @@ async function loadMyPurchases(){
 
   try{
 
-    const res = await fetch(API_URL + "?action=mesAchats&phone=" + phone);
+    const res = await fetch(API_URL + "?action=mesAchats&phone=" + phone + "&t=" + Date.now());
     const result = await res.json();
 
-    if(!result.success){
+    let html = "";
+
+    if(!result.data || result.data.length === 0){
       document.getElementById("content").innerHTML = "<p>Aucun achat trouvé</p>";
       return;
     }
 
-    let html = "";
-
     result.data.forEach(item => {
 
-  if(item.status === "VALIDÉ"){
+      html += `
+        <div class="card">
+          <h3>${item.title}</h3>
+          <p>Action : ${item.action}</p>
+          <p>Statut : ${item.status}</p>
+        </div>
+      `;
 
-    html += `
-      <div class="card">
-        <h3>${item.title}</h3>
-        <p>Action : ${item.action}</p>
-        <p>Statut : PRÊT POUR IMPRESSION</p>
-
-        <button onclick="window.open('${item.link}', '_blank')">
-          🖨 CLIQUER ICI POUR IMPRIMER
-        </button>
-      </div>
-    `;
-  }
-
-});
+    });
 
     document.getElementById("content").innerHTML = html;
 
