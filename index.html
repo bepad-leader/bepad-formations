@@ -338,15 +338,22 @@ async function loadMyPurchases(){
 
     result.data.forEach(item => {
 
-      html += `
-        <div class="card">
-          <h3>${item.title}</h3>
-          <p>Action : ${item.action}</p>
-          <p>Statut : ${item.status}</p>
-        </div>
-      `;
+  html += `
+    <div class="card">
+      <h3>${item.title}</h3>
+      <p>Action : ${item.action}</p>
+      <p>Statut : ${item.status}</p>
 
-    });
+      ${item.status === "VALIDÉ"
+        ? `<button onclick="window.open('${item.link}','_blank')">
+             🖨 IMPRIMER LE DOCUMENT
+           </button>`
+        : ""
+      }
+    </div>
+  `;
+
+});
 
     document.getElementById("content").innerHTML = html;
 
