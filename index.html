@@ -66,10 +66,11 @@ button{
   <button onclick="showSection('GESTION_PRIVEE')">🏫 GESTION PRIVÉE</button>
   <button onclick="showSection('VIDEO')">🎥 VIDEO</button>
 
-  <button onclick="window.location.href='contacts.html'">
-    <button onclick="loadMyPurchases()">📦 MES ACHATS</button>
-    📞 CONTACTS
-  </button>
+  <button onclick="loadMyPurchases()">📦 MES ACHATS</button>
+
+<button onclick="window.location.href='contacts.html'">
+  📞 CONTACTS
+</button>
 
 </div>
 
@@ -353,78 +354,55 @@ function closePayment(){
   document.getElementById("paymentBox").style.display = "none";
 }
 function loadMyPurchases(){
-
-  fetch("https://script.google.com/macros/s/AKfycbwSIMagUjrwnTOkpglXVIqB7MxznyiFw7BKhlnVH_gWcV_5kBUcxXZcE45usBgn6DRR/exec?action=mesAchats")
+  fetch(API_URL + "?section=mesAchats")
     .then(res => res.json())
-    .then(result => {
+    .then(data => {
 
-  alert(JSON.stringify(result));
+      const content = document.getElementById("content");
 
-      let html = "";
+      if(!data.success || !data.data || data.data.length === 0){
+        content.innerHTML = "<p>Aucun achat trouvé</p>";
+        return;
+      }
 
-      result.data.forEach(item => {
-
-        html += `
-          <div class="card">
-            <h3>${item.title}</h3>
-            <p>Action : ${item.action}</p>
-            <p>Statut : ${item.status}</p>
-        `;
+      content.innerHTML = data.data.map(item => {
 
         // 📖 LECTURE
-        if(item.action === "lecture" && item.status === "VALIDÉ"){
-
-  const now = Date.now();
-
-  let lectureStatus = "";
-
-  if(!item.startTime || !item.endTime){
-    lectureStatus = "⚠ NON CONFIGURÉ";
-  }
-  else if(now < item.startTime){
-    lectureStatus = "🟡 PAS ENCORE ACTIF";
-  }
-  else if(now > item.endTime){
-    lectureStatus = "🔴 EXPIRÉ";
-  }
-  else{
-    lectureStatus = "🟢 ACTIF";
-  }
-
-  html += `
-    <p>Lecture : ${lectureStatus}</p>
-  `;
-
-  if(lectureStatus === "🟢 ACTIF"){
-
-    html += `
-      <button onclick="openLecture('${item.link}', ${item.startTime}, ${item.endTime})">
-        📖 LIRE LE DOCUMENT
-      </button>
-    `;
-  }
-}
-
-        // 🖨 IMPRESSION
-        if(item.action === "impression" && item.status === "VALIDÉ"){
-
-          html += `
-            <button onclick="window.open('${item.link}', '_blank')">
-              🖨 IMPRIMER (${item.pagesInput})
-            </button>
+        if(item.type === "lecture"){
+          return `
+            <div class="card">
+              <h3>${item.title}</h3>
+              <button onclick="window.open('${item.link}', '_blank')">
+                📖 Lire
+              </button>
+            </div>
           `;
         }
 
-        html += `</div>`;
-      });
+        // 🖨️ IMPRESSION
+        if(item.type === "impression"){
+          return `
+            <div class="card">
+              <h3>${item.title}</h3>
+              <button onclick="window.open('${item.link}', '_blank')">
+                🖨️ Imprimer
+              </button>
+            </div>
+          `;
+        }
 
-      document.getElementById("mesAchats").innerHTML = html;
+        // défaut
+        return `
+          <div class="card">
+            <h3>${item.title}</h3>
+            <button onclick="window.open('${item.link}', '_blank')">
+              Ouvrir
+            </button>
+          </div>
+        `;
 
-    })
-    .catch(err => {
-      console.error(err);
-      document.getElementById("mesAchats").innerHTML =
-        "<p>Erreur de chargement</p>";
+      }).join("");
+
     });
 }
   function openLecture(link, startTime, endTime){
