@@ -119,30 +119,50 @@ function backMenu(){
 /* OPEN PAYMENT */
 function chooseAction(title, link, type){
 
-  currentFile = { title, link, type };
+  currentFile = {
+    title: title,
+    link: link,
+    type: type
+  };
 
+  // 📖 CAS LECTURE
+  if(type === "lecture"){
+
+    document.getElementById("content").innerHTML = `
+      <div class="card">
+        <h3>📖 Lecture du document</h3>
+        <p>✔ Accès au document</p>
+
+        <button onclick="window.open('${link}', '_blank')">
+          Ouvrir le document
+        </button>
+      </div>
+    `;
+
+    document.getElementById("paymentBox").style.display = "block";
+    return;
+  }
+
+  // 🖨 CAS IMPRESSION
   if(type === "impression"){
 
-  
+    window.open(link, "_blank");
 
-  window.open(link, "_blank");
+    document.getElementById("content").innerHTML = `
+      <div class="card">
+        <h3>📄 Document ouvert</h3>
+        <p>✔ Consultez le document dans l’onglet ouvert.</p>
+        <p>✔ Revenez ici pour continuer l’impression.</p>
 
-  document.getElementById("content").innerHTML = `
-    <div class="card">
-      <h3>📄 Document ouvert</h3>
-      <p>✔ Consultez le document dans l’onglet ouvert.</p>
-      <p>✔ Revenez ici pour continuer l’impression.</p>
+        <button onclick="continueImpression()">
+          Continuer impression
+        </button>
+      </div>
+    `;
 
-      <button onclick="continueImpression()">
-        Continuer impression
-      </button>
-    </div>
-  `;
+    return;
+  }
 
-  return;
-}
-
-  document.getElementById("paymentBox").style.display = "block";
 }
 
 /* LOAD SECTIONS */
@@ -237,15 +257,34 @@ async function showSection(section){
     return;
   }
 
-  currentFile.pagesInput = input;
+  const cleanInput = input.trim();
 
-  const pages = calculatePages(input);
+  const pages = calculatePages(cleanInput);
+
+  if(pages <= 0){
+    alert("Format de pages invalide");
+    return;
+  }
+
   const amount = pages * 200;
 
+  currentFile.pagesInput = cleanInput;
   currentFile.pages = pages;
   currentFile.amount = amount;
 
+  // affichage paiement
   document.getElementById("paymentBox").style.display = "block";
+
+  // feedback utilisateur (important)
+  document.getElementById("content").innerHTML = `
+    <div class="card">
+      <h3>🖨 Impression prête</h3>
+      <p>Pages choisies : <b>${cleanInput}</b></p>
+      <p>Nombre de pages : <b>${pages}</b></p>
+      <p>Montant : <b>${amount} FCFA</b></p>
+      <p>✔ Procédez au paiement</p>
+    </div>
+  `;
 }
 
 /* PAYMENT */
@@ -267,11 +306,11 @@ const data = {
   phone: phone,
   transactionId: trans,
   title: currentFile ? currentFile.title : "",
-  action: currentFile ? currentFile.type : "",
+  action: currentFile?.type || "",
   pagesInput: currentFile.pagesInput || "",
   pages: pages,
   amount: amount,
-  link: currentFile.link
+  link: currentFile?.link || ""
 };
 
   try {
@@ -313,47 +352,99 @@ const data = {
 function closePayment(){
   document.getElementById("paymentBox").style.display = "none";
 }
-async function loadMyPurchases(){
+function loadMyPurchases(){
 
-  const phone = document.getElementById("phone").value;
+  fetch("URL_DE_TON_APPS_SCRIPT")
+    .then(res => res.json())
+    .then(result => {
 
-  if(!phone){
-    alert("Veuillez entrer votre téléphone");
+      let html = "";
+
+      result.data.forEach(item => {
+
+        html += `
+          <div class="card">
+            <h3>${item.title}</h3>
+            <p>Action : ${item.action}</p>
+            <p>Statut : ${item.status}</p>
+        `;
+
+        // 📖 LECTURE
+        if(item.action === "lecture" && item.status === "VALIDÉ"){
+
+  const now = Date.now();
+
+  let lectureStatus = "";
+
+  if(!item.startTime || !item.endTime){
+    lectureStatus = "⚠ NON CONFIGURÉ";
+  }
+  else if(now < item.startTime){
+    lectureStatus = "🟡 PAS ENCORE ACTIF";
+  }
+  else if(now > item.endTime){
+    lectureStatus = "🔴 EXPIRÉ";
+  }
+  else{
+    lectureStatus = "🟢 ACTIF";
+  }
+
+  html += `
+    <p>Lecture : ${lectureStatus}</p>
+  `;
+
+  if(lectureStatus === "🟢 ACTIF"){
+
+    html += `
+      <button onclick="openLecture('${item.link}', ${item.startTime}, ${item.endTime})">
+        📖 LIRE LE DOCUMENT
+      </button>
+    `;
+  }
+}
+
+        // 🖨 IMPRESSION
+        if(item.action === "impression" && item.status === "VALIDÉ"){
+
+          html += `
+            <button onclick="window.open('${item.link}', '_blank')">
+              🖨 IMPRIMER (${item.pagesInput})
+            </button>
+          `;
+        }
+
+        html += `</div>`;
+      });
+
+      document.getElementById("mesAchats").innerHTML = html;
+
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("mesAchats").innerHTML =
+        "<p>Erreur de chargement</p>";
+    });
+}
+  function openLecture(link, startTime, endTime){
+
+  const now = Date.now();
+
+  if(!startTime || !endTime){
+    alert("Accès lecture non configuré");
     return;
   }
 
-  document.getElementById("content").innerHTML = "<p>Chargement...</p>";
-
-  try{
-
-    const res = await fetch(API_URL + "?action=mesAchats&phone=" + phone + "&t=" + Date.now());
-    const result = await res.json();
-
-    let html = "";
-
-    if(!result.data || result.data.length === 0){
-      document.getElementById("content").innerHTML = "<p>Aucun achat trouvé</p>";
-      return;
-    }
-
-    result.data.forEach(item => {
-
-  html += `
-    <div class="card">
-      <h3>${item.title}</h3>
-      <p>Action : ${item.action}</p>
-      <p>Statut : ${item.status}</p>
-    </div>
-  `;
-
-});
-
-    document.getElementById("content").innerHTML = html;
-
-  }catch(err){
-    console.log(err);
-    alert("Erreur chargement achats");
+  if(now < startTime){
+    alert("Accès pas encore activé");
+    return;
   }
+
+  if(now > endTime){
+    alert("Accès lecture expiré");
+    return;
+  }
+
+  window.open(link, "_blank");
 }
 </script>
 
