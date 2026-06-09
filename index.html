@@ -343,6 +343,14 @@ async function loadMyPurchases(){
       <h3>${item.title}</h3>
       <p>Action : ${item.action}</p>
       <p>Statut : ${item.status}</p>
+      html += `
+  <div class="card">
+    <h3>${item.title}</h3>
+    <p>Action : ${item.action}</p>
+    <p>Statut : ${item.status}</p>
+    <p>Lien : ${item.link}</p>
+  </div>
+`;
 
       ${item.status === "VALIDÉ"
         ? `<button onclick="window.open('${item.link}','_blank')">
