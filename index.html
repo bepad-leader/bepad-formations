@@ -358,6 +358,8 @@ function loadMyPurchases(){
     .then(res => res.json())
     .then(result => {
 
+  alert(JSON.stringify(result));
+
       let html = "";
 
       result.data.forEach(item => {
