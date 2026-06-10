@@ -353,48 +353,38 @@ const data = {
 function closePayment(){
   document.getElementById("paymentBox").style.display = "none";
 }
-function loadMyPurchases(){
-  fetch(API_URL + "?section=mesAchats")
+function loadMyPurchases() {
+
+  // 1. Demande du numéro
+  const phone = prompt("📦 MES ACHATS\n\nEntrez le numéro utilisé lors du paiement :");
+
+  if (!phone) {
+    alert("Numéro requis");
+    return;
+  }
+
+  // 2. Requête vers Apps Script
+  fetch(API_URL + "?section=mesAchats&phone=" + encodeURIComponent(phone))
+
     .then(res => res.json())
+
     .then(data => {
 
       const content = document.getElementById("content");
 
-      if(!data.success || !data.data || data.data.length === 0){
+      // 3. Si rien trouvé
+      if (!data.success || !data.data || data.data.length === 0) {
         content.innerHTML = "<p>Aucun achat trouvé</p>";
         return;
       }
 
+      // 4. Affichage des achats
       content.innerHTML = data.data.map(item => {
 
-        // 📖 LECTURE
-        if(item.type === "lecture"){
-          return `
-            <div class="card">
-              <h3>${item.title}</h3>
-              <button onclick="window.open('${item.link}', '_blank')">
-                📖 Lire
-              </button>
-            </div>
-          `;
-        }
-
-        // 🖨️ IMPRESSION
-        if(item.type === "impression"){
-          return `
-            <div class="card">
-              <h3>${item.title}</h3>
-              <button onclick="window.open('${item.link}', '_blank')">
-                🖨️ Imprimer
-              </button>
-            </div>
-          `;
-        }
-
-        // défaut
         return `
           <div class="card">
             <h3>${item.title}</h3>
+            <p>${item.type}</p>
             <button onclick="window.open('${item.link}', '_blank')">
               Ouvrir
             </button>
