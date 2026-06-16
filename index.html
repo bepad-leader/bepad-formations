@@ -92,7 +92,7 @@ button{
 
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxoHYO7Oh7xZWbD8uR3Q56ZebVVn1ef3EM6kKb-aLIpOYCGcpUmzEQuKVE0oarW6zmM/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz5GqkocEd9oLkembGwEuNI0o9xvFfNOI6GTkapwMpmW6wgX-AKHIhqkAHWKeWaj8_i/exec";
 
 let currentFile = null;
 
@@ -320,7 +320,7 @@ const data = {
       method: "POST",
       body: JSON.stringify(data),
       headers: {
-        "Content-Type": "text/plain;charset=utf-8"
+        "Content-Type": "application/json"
       }
     });
 
@@ -354,45 +354,44 @@ function closePayment(){
   document.getElementById("paymentBox").style.display = "none";
 }
 function loadMyPurchases() {
-
-  // 1. Demande du numéro
   const phone = prompt("📦 MES ACHATS\n\nEntrez le numéro utilisé lors du paiement :");
-
   if (!phone) {
     alert("Numéro requis");
     return;
   }
 
-  // 2. Requête vers Apps Script
-  fetch(API_URL + "?section=mesAchats&phone=" + encodeURIComponent(phone))
-
+  fetch(API_URL + "?section=MESACHATS&phone=" + encodeURIComponent(phone))
     .then(res => res.json())
-
     .then(data => {
-
       const content = document.getElementById("content");
 
-      // 3. Si rien trouvé
-      if (!data.success || !data.data || data.data.length === 0) {
+      console.log("MES ACHATS RESPONSE:", data);
+
+      if (!data.success) {
+        content.innerHTML = "<p>Erreur serveur</p>";
+        return;
+      }
+
+      if (!data.data || data.data.length === 0) {
         content.innerHTML = "<p>Aucun achat trouvé</p>";
         return;
       }
 
-      // 4. Affichage des achats
-      content.innerHTML = data.data.map(item => {
-
-        return `
-          <div class="card">
-            <h3>${item.title}</h3>
-            <p>${item.type}</p>
-            <button onclick="window.open('${item.link}', '_blank')">
-              Ouvrir
-            </button>
-          </div>
-        `;
-
-      }).join("");
-
+      content.innerHTML = data.data.map(item => `
+        <div class="card">
+          <h3>${item.title}</h3>
+          <p>${item.type}</p>
+          <p>Statut: ${item.status || "EN COURS"}</p>
+          <button onclick="window.open('${item.link}', '_blank')">
+            Ouvrir
+          </button>
+        </div>
+      `).join("");
+    })
+    .catch(err => {
+      console.log(err);
+      document.getElementById("content").innerHTML =
+        "<p>Erreur de connexion serveur</p>";
     });
 }
   function openLecture(link, startTime, endTime){
